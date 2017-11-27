@@ -1,13 +1,8 @@
 package com.yu.crawlers;
 
-import com.yu.crawlers.implement.SearchType;
-import com.yu.crawlers.music163.SpiderMusic;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by yuliu on 2017/11/27 0027.
