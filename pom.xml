@@ -5,7 +5,10 @@
   <groupId>com.yu</groupId>
   <artifactId>personal-web</artifactId>
   <version>1.0.0</version>
-  <packaging>jar</packaging>
+    <modules>
+        <module>utils</module>
+    </modules>
+    <packaging>pom</packaging>
 
   <name>personal-web</name>
   <url>http://maven.apache.org</url>
@@ -18,8 +21,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
+      <version>RELEASE</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

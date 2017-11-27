@@ -1,14 +1,21 @@
+package com.yu.utils;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Main {
-
-    public static void main(String[] args) {
-        String r = parseQueryString("/song?id=12345&name=&b", "id");
-        System.out.println(r);
-    }
-
-    public static String parseQueryString(String matchUrl, String key) {
+/**
+ * Created by yuliu on 2017/11/27 0027.
+ */
+public class StrUtils {
+    /**
+     * 继续并获取路径参数
+     * @param matchUrl 解析路径
+     * @param key 获取参数的key值
+     * @return
+     */
+    public static String parseUrlParam(String matchUrl, String key) {
         String r = null;
         if (matchUrl != null && key != null) {
             String reg = "([^?&=]+)((?:=([^?&=]*))*)";
