@@ -7,10 +7,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>sprider-music</artifactId>
+    <artifactId>spider-music</artifactId>
     <packaging>jar</packaging>
 
-    <name>sprider-music</name>
+    <name>spider-music</name>
     <url>http://maven.apache.org</url>
 
     <properties>

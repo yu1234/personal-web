@@ -5,26 +5,20 @@ import com.yu.crawlers.implement.SearchType;
 import com.yu.crawlers.implement.SpiderInfoCallback;
 import com.yu.crawlers.music163.SpiderMusic;
 import org.apache.commons.lang3.ObjectUtils;
-import org.junit.Test;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-
 /**
- * Unit test for simple App.
+ * Created by yuliu on 2017/11/28 0028.
  */
-public class AppTest implements SpiderInfoCallback<List<String>> {
-    @Test
-    public void SpiderMusicTest() {
-        SpiderMusic spiderMusic = new SpiderMusic();
-        spiderMusic.run(null, null);
+public class SpiderTest implements SpiderInfoCallback {
+
+    public static void main(String[] args) {
+        SpiderTest test = new SpiderTest();
+        test.mainTest();
     }
 
-    @Test
     public void mainTest() {
         Main.instance();
         SpiderMusic spiderMusic = Main.getBean(SpiderMusic.class);
@@ -35,12 +29,7 @@ public class AppTest implements SpiderInfoCallback<List<String>> {
         }
     }
 
-    public void successCallback(List<String> list) {
-
-        System.out.println(list.size());
-        for (String id : list) {
-            System.out.println(id);
-        }
+    public void successCallback(Object o) {
 
     }
 }
