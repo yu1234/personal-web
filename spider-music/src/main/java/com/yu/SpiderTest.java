@@ -7,6 +7,7 @@ import com.yu.crawlers.music163.SpiderMusic;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,8 +25,9 @@ public class SpiderTest implements SpiderInfoCallback {
         SpiderMusic spiderMusic = Main.getBean(SpiderMusic.class);
         if (ObjectUtils.allNotNull(spiderMusic)) {
             Map map = new HashMap();
-            map.put("id", "1980616764");
-            spiderMusic.run(SearchType.PLAY_LIST_INFO, map, this);
+            map.put("ids", "[33544055]");
+            map.put("br", "320000");
+            spiderMusic.run(SearchType.SONG, this, map);
         }
     }
 

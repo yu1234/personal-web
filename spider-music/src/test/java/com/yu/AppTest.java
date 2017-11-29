@@ -31,7 +31,7 @@ public class AppTest implements SpiderInfoCallback<List<String>> {
         if (ObjectUtils.allNotNull(spiderMusic)) {
             Map map = new HashMap();
             map.put("id", "1980616764");
-            spiderMusic.run(SearchType.PLAY_LIST_INFO, map, this);
+            spiderMusic.run(SearchType.PLAY_LIST_INFO, this,map);
         }
     }
 

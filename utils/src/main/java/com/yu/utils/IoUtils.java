@@ -18,6 +18,10 @@ public class IoUtils {
         boolean flag = false;
         try {
             File file = new File(filePath);
+            File fileParent = file.getParentFile();
+            if(!fileParent.exists()){
+                fileParent.mkdirs();
+            }
             FileWriter fw = new FileWriter(file);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(content);

@@ -7,6 +7,7 @@
             <map>
                 <entry key="playList" value="http://music.163.com/playlist"/>
                 <entry key="playListInfo" value="http://music.163.com/playlist"/>
+                <entry key="song" value="http://music.163.com/api/song/enhance/player/url"/>
             </map>
         </property>
     </bean>

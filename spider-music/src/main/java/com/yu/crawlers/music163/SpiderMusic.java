@@ -7,12 +7,15 @@ import cn.wanghaomiao.seimi.struct.Response;
 import cn.wanghaomiao.xpath.exception.XpathSyntaxErrorException;
 import cn.wanghaomiao.xpath.model.JXDocument;
 import cn.wanghaomiao.xpath.model.JXNode;
+import com.yu.crawlers.bean.Song;
 import com.yu.crawlers.bean.SongSheet;
 import com.yu.crawlers.implement.SpiderInfoCallback;
 import com.yu.crawlers.implement.SearchType;
 import com.yu.utils.IoUtils;
 import com.yu.utils.StrUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,19 +30,12 @@ public class SpiderMusic extends BaseSeimiCrawler {
     private static SpiderInfoCallback spiderInfoCallback;
     private static SearchType searchType;
     private static Map<String, String> urlMap;
-    private static Map<String, String> params;
+    private static String[] startUrls = new String[0];
 
     public String[] startUrls() {
-        if (ObjectUtils.allNotNull(urlMap, searchType)) {
-            if (ObjectUtils.allNotNull(urlMap.get(searchType.getType()))) {
-                String paramStr = this.spliceParams(params);
-                return new String[]{urlMap.get(searchType.getType()) + "?" + paramStr};
-            } else {
-                return new String[0];
-            }
-        } else {
-            return new String[0];
-        }
+
+        return startUrls;
+
 
     }
 
@@ -48,6 +44,8 @@ public class SpiderMusic extends BaseSeimiCrawler {
             this.getPlayList(response);
         } else if ("playListInfo".equals(searchType.getType())) {
             this.getPlayListInfo(response);
+        }else if("song".equals(searchType.getType())){
+            this.getSong(response);
         }
 
     }
@@ -138,21 +136,33 @@ public class SpiderMusic extends BaseSeimiCrawler {
     }
 
     /**
+     * 获取歌曲信息
+     */
+    public void getSong(Response response) {
+        if (ObjectUtils.allNotNull(response)) {
+            JXDocument xdoc = response.document();
+            Document jdoc = Jsoup.parse(response.getContent()) ;
+            Song song = new Song();
+            IoUtils.WriteStringToFile("F:/spiderFile/song.html", response.getContent());
+        }
+    }
+
+    /**
      * 开始爬虫
      *
      * @param
      */
-    public void run(SearchType _searchType, Map<String, String> _params) {
+    public void run(SearchType _searchType, Map<String, String>... params) {
         searchType = _searchType;
-        params = _params;
+        this.getStartUrls(params);
         Seimi s = new Seimi();
         s.goRun("SpiderMusic");
     }
 
-    public <T> void run(SearchType _searchType, Map<String, String> _params, SpiderInfoCallback<T> _spiderInfoCallback) {
+    public <T> void run(SearchType _searchType, SpiderInfoCallback<T> _spiderInfoCallback, Map<String, String>... params) {
         searchType = _searchType;
-        params = _params;
         spiderInfoCallback = _spiderInfoCallback;
+        this.getStartUrls(params);
         Seimi s = new Seimi();
         s.goRun("SpiderMusic");
     }
@@ -181,5 +191,29 @@ public class SpiderMusic extends BaseSeimiCrawler {
 
     public void setUrlMap(Map<String, String> _urlMap) {
         urlMap = _urlMap;
+    }
+
+    /**
+     * 设置爬取路径
+     *
+     * @param params
+     */
+    private void getStartUrls(Map<String, String>... params) {
+        if (ObjectUtils.allNotNull(urlMap, searchType)) {
+            if (ObjectUtils.allNotNull(urlMap.get(searchType.getType()))) {
+                if (ObjectUtils.allNotNull(params) && params.length > 0) {
+                    for (Map<String, String> param : params) {
+                        String paramStr = this.spliceParams(param);
+                        startUrls = new String[]{urlMap.get(searchType.getType()) + "?" + paramStr};
+                    }
+                } else {
+                    startUrls = new String[]{urlMap.get(searchType.getType())};
+                }
+            } else {
+                startUrls = new String[0];
+            }
+        } else {
+            startUrls = new String[0];
+        }
     }
 }
