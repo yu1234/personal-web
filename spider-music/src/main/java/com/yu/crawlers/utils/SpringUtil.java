@@ -1,6 +1,5 @@
 package com.yu.crawlers.utils;
 
-import com.yu.crawlers.Main;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -11,8 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SpringUtil implements ApplicationContextAware {
-    public static ApplicationContext applicationContext =  Main.applicationContext;
-
+    public static ApplicationContext applicationContext = null;
 
     //获取applicationContext
     public static ApplicationContext getApplicationContext() {
@@ -45,7 +43,7 @@ public class SpringUtil implements ApplicationContextAware {
         return getApplicationContext().getBean(name, clazz);
     }
 
-    public  void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         SpringUtil.applicationContext = applicationContext;
     }
 }

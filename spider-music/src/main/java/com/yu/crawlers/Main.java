@@ -8,12 +8,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * Created by yuliu on 2017/11/27 0027.
  */
-public class Main  {
-    public static ApplicationContext applicationContext = null;
+public class Main {
+
 
     private static void run() {
-        if (!ObjectUtils.allNotNull(Main.applicationContext)) {
-            Main.applicationContext= new ClassPathXmlApplicationContext("application.xml");
+        if (!ObjectUtils.allNotNull(SpringUtil.applicationContext)) {
+            new ClassPathXmlApplicationContext("application.xml");
         }
     }
 }
