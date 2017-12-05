@@ -1,13 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean id="music163.SpiderMusic" class="com.yu.crawlers.music163.SpiderMusic">
-        <property name="urlMap">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mongo="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <context:component-scan base-package="com.yu.crawlers"/>
+    <!-- 获取配置资源 -->
+    <context:property-placeholder location="classpath:mongodb.properties" />
+    <mongo:mongo id="mongo" host="${mongo.host}" port="${mongo.port}">
+        <mongo:options
+                connections-per-host="${mongo.connectionsPerHost}"
+                threads-allowed-to-block-for-connection-multiplier="${mongo.threadsAllowedToBlockForConnectionMultiplier}"
+                connect-timeout="${mongo.connectTimeout}"
+                max-wait-time="${mongo.maxWaitTime}"
+                auto-connect-retry="${mongo.autoConnectRetry}"
+                socket-keep-alive="${mongo.socketKeepAlive}"
+                socket-timeout="${mongo.socketTimeout}"
+                slave-ok="${mongo.slaveOk}"
+                write-number="1"
+                write-timeout="0" write-fsync="true"/>
+    </mongo:mongo>
+    <!-- 设置使用的数据库 名-->
+    <mongo:db-factory dbname="${mongo.dbName}" mongo-ref="mongo"/>
+    <!-- mongodb的模板 -->
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg ref="mongo" />
+        <constructor-arg name="databaseName" value="${mongo.dbName}" />
+    </bean>
+
+    <bean id="music163.SpiderMusic" class="com.yu.crawlers.netease.SpiderMusic">
+        <property name="neteaseUrlMap">
             <map>
-                <entry key="playList" value="http://music.163.com/playlist"/>
-                <entry key="playListInfo" value="http://music.163.com/playlist"/>
-                <entry key="song" value="http://music.163.com/api/song/enhance/player/url"/>
+                <entry key="playList" value="http://music.163.com/api/v3/playlist/detail"/>
+                <entry key="song" value="http://music.163.com/api/v3/song/detail"/>
+                <entry key="url" value="http://music.163.com/api/song/enhance/player/url"/>
+                <entry key="artist" value="http://music.163.com/api/v1/artist"/>
+                <entry key="album" value="http://music.163.com/api/v1/album"/>
+                <entry key="lyric" value="http://music.163.com/api/song/lyric"/>
             </map>
         </property>
     </bean>

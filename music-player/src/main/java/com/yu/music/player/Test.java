@@ -1,7 +1,7 @@
 package com.yu.music.player;
 
 import com.yu.crawlers.implement.SearchType;
-import com.yu.crawlers.music163.SpiderMusic;
+import com.yu.crawlers.netease.SpiderMusic;
 import com.yu.crawlers.utils.SpringUtil;
 
 import java.util.HashMap;

@@ -3,12 +3,10 @@ package com.yu;
 import com.yu.crawlers.Main;
 import com.yu.crawlers.implement.SearchType;
 import com.yu.crawlers.implement.SpiderInfoCallback;
-import com.yu.crawlers.music163.SpiderMusic;
+import com.yu.crawlers.netease.SpiderMusic;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.Test;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

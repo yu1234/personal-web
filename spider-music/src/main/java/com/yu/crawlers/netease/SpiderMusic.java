@@ -1,4 +1,4 @@
-package com.yu.crawlers.music163;
+package com.yu.crawlers.netease;
 
 import cn.wanghaomiao.seimi.annotation.Crawler;
 import cn.wanghaomiao.seimi.core.Seimi;
@@ -29,7 +29,7 @@ public class SpiderMusic extends BaseSeimiCrawler {
 
     private static SpiderInfoCallback spiderInfoCallback;
     private static SearchType searchType;
-    private static Map<String, String> urlMap;
+    private static Map<String, String> neteaseUrlMap;
     private static String[] startUrls = new String[0];
 
     public String[] startUrls() {
@@ -185,12 +185,12 @@ public class SpiderMusic extends BaseSeimiCrawler {
         return sb.toString();
     }
 
-    public Map<String, String> getUrlMap() {
-        return urlMap;
+    public  Map<String, String> getNeteaseUrlMap() {
+        return neteaseUrlMap;
     }
 
-    public void setUrlMap(Map<String, String> _urlMap) {
-        urlMap = _urlMap;
+    public  void setNeteaseUrlMap(Map<String, String> neteaseUrlMap) {
+        SpiderMusic.neteaseUrlMap = neteaseUrlMap;
     }
 
     /**
@@ -199,15 +199,15 @@ public class SpiderMusic extends BaseSeimiCrawler {
      * @param params
      */
     private void getStartUrls(Map<String, String>... params) {
-        if (ObjectUtils.allNotNull(urlMap, searchType)) {
-            if (ObjectUtils.allNotNull(urlMap.get(searchType.getType()))) {
+        if (ObjectUtils.allNotNull(neteaseUrlMap, searchType)) {
+            if (ObjectUtils.allNotNull(neteaseUrlMap.get(searchType.getType()))) {
                 if (ObjectUtils.allNotNull(params) && params.length > 0) {
                     for (Map<String, String> param : params) {
                         String paramStr = this.spliceParams(param);
-                        startUrls = new String[]{urlMap.get(searchType.getType()) + "?" + paramStr};
+                        startUrls = new String[]{neteaseUrlMap.get(searchType.getType()) + "?" + paramStr};
                     }
                 } else {
-                    startUrls = new String[]{urlMap.get(searchType.getType())};
+                    startUrls = new String[]{neteaseUrlMap.get(searchType.getType())};
                 }
             } else {
                 startUrls = new String[0];

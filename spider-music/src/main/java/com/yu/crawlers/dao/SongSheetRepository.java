@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 /**
  * Created by yuliu on 2017/11/29 0029.
  */
-@Repository
 public interface SongSheetRepository extends MongoRepository<SongSheet,String> {
 }
