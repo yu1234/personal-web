@@ -2,6 +2,7 @@ package com.yu;
 
 import com.mongodb.DB;
 import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import org.junit.Test;
 
 import java.util.Set;

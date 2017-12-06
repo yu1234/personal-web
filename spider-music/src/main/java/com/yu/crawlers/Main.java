@@ -11,7 +11,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class Main {
 
 
-    private static void run() {
+    public static void run() {
         if (!ObjectUtils.allNotNull(SpringUtil.applicationContext)) {
             new ClassPathXmlApplicationContext("application.xml");
         }

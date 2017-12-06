@@ -1,5 +1,7 @@
 package com.yu.utils;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -11,8 +13,9 @@ import java.util.regex.Pattern;
 public class StrUtils {
     /**
      * 继续并获取路径参数
+     *
      * @param matchUrl 解析路径
-     * @param key 获取参数的key值
+     * @param key      获取参数的key值
      * @return
      */
     public static String parseUrlParam(String matchUrl, String key) {
@@ -29,5 +32,16 @@ public class StrUtils {
             }
         }
         return r;
+    }
+
+    /**
+     * object to String
+     */
+    public static String objectToString(Object o) {
+        String value="";
+        if (ObjectUtils.allNotNull(o)) {
+            value = o.toString();
+        }
+        return value;
     }
 }

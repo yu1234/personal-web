@@ -7,7 +7,9 @@ public class Song {
     private String id;// 音乐ID
     private String name; // 音乐名字
     private String artist;// 艺术家名字
+    private String artistId;// 艺术家id
     private String album;// 专辑名字
+    private String albumId;// 专辑id
     private String source;// 音乐来源
     private String cover;// 专辑图片
     private String lyricId;// 歌词ID
@@ -75,5 +77,21 @@ public class Song {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(String artistId) {
+        this.artistId = artistId;
+    }
+
+    public String getAlbumId() {
+        return albumId;
+    }
+
+    public void setAlbumId(String albumId) {
+        this.albumId = albumId;
     }
 }

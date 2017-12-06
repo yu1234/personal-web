@@ -1,10 +1,10 @@
 package com.yu;
 
 import com.yu.crawlers.Main;
-import com.yu.crawlers.implement.SearchType;
-import com.yu.crawlers.implement.SpiderInfoCallback;
+import com.yu.crawlers.implement.IParseCallback;
 import com.yu.crawlers.netease.SpiderMusic;
-import org.apache.commons.lang3.ObjectUtils;
+import com.yu.crawlers.netease.parse.SongSheetParse;
+import com.yu.crawlers.utils.SpringUtil;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -15,22 +15,21 @@ import java.util.Map;
 /**
  * Unit test for simple App.
  */
-public class AppTest implements SpiderInfoCallback<List<String>> {
+public class AppTest implements IParseCallback<List<String>> {
     @Test
     public void SpiderMusicTest() {
         SpiderMusic spiderMusic = new SpiderMusic();
-        spiderMusic.run(null, null);
     }
 
     @Test
     public void mainTest() {
-        Main.instance();
-        SpiderMusic spiderMusic = Main.getBean(SpiderMusic.class);
-        if (ObjectUtils.allNotNull(spiderMusic)) {
-            Map map = new HashMap();
-            map.put("id", "1980616764");
-            spiderMusic.run(SearchType.PLAY_LIST_INFO, this,map);
-        }
+        Main.run();
+        SpiderMusic spiderMusic=  SpringUtil.getBean(SpiderMusic.class);
+        Map map=new HashMap();
+        map.put("id","94284266");
+        SongSheetParse playSheetParse=new SongSheetParse(map);
+        spiderMusic.run(playSheetParse);
+
     }
 
     public void successCallback(List<String> list) {
