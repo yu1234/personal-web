@@ -1,8 +1,12 @@
 package com.yu.crawlers.netease.parse;
 
+import cn.wanghaomiao.seimi.http.HttpMethod;
+import cn.wanghaomiao.seimi.struct.Request;
 import cn.wanghaomiao.seimi.struct.Response;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.yu.crawlers.bean.Album;
 import com.yu.crawlers.bean.Song;
 import com.yu.crawlers.bean.SongSheet;
 import com.yu.crawlers.dao.repositories.SongRepository;
@@ -16,9 +20,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by yuliu on 2017/12/5 0005.
@@ -37,8 +39,6 @@ public class SongSheetParse implements ISpiderOperator {
     private final static String KEY_SONGS = "playlist.tracks";
     private final static String KEY_SONG_ID = "id";
     private final static String KEY_SONG_NAME = "name";
-    private final static String KEY_SONG_ALBUM_ID = "al.id";
-    private final static String KEY_SONG_ALBUM_NAME = "al.name";
 
     private SongSheet songSheet;
 
@@ -48,6 +48,7 @@ public class SongSheetParse implements ISpiderOperator {
 
     private SongRepository songRepository;
 
+    private Request request;
     private String url = "http://music.163.com/api/v3/playlist/detail";
     private Map<String, String> params;
 
@@ -55,14 +56,13 @@ public class SongSheetParse implements ISpiderOperator {
         init();
     }
 
-    public SongSheetParse(Map<String, String> params) {
-        this.params = params;
+    public SongSheetParse(String id) {
+        this.setParams(id);
         init();
     }
 
-    public SongSheetParse(String url, Map<String, String> params) {
-        this.url = url;
-        this.params = params;
+    public SongSheetParse(Request request) {
+        this.request = request;
         init();
     }
 
@@ -70,6 +70,18 @@ public class SongSheetParse implements ISpiderOperator {
         this.songSheetRepository = SpringUtil.getBean(SongSheetRepository.class);
         this.songRepository = SpringUtil.getBean(SongRepository.class);
         this.callbacks = new ArrayList<IParseCallback<SongSheet>>();
+        //初始化参数
+        if (!ObjectUtils.allNotNull(this.params)) {
+            this.params = new HashMap<String, String>();
+        }
+        //初始化请求对象
+        if (ObjectUtils.allNotNull(this.request)) {
+            this.request.setCallBack("start");
+        } else {
+            this.request = Request.build(url, "start");
+            this.request.setParams(this.params);
+            this.request.setHttpMethod(HttpMethod.GET);
+        }
     }
 
     /**
@@ -82,6 +94,7 @@ public class SongSheetParse implements ISpiderOperator {
         if (!StringUtils.isAllBlank(content)) {
             this.songSheet = new SongSheet();
             this.songSheet.setSource("netease");
+            this.songSheet.setDate(new Date());
             JSONUtil jsonUtil = JSONUtil.parseObject(content);
             String[] keys = new String[]{
                     KEY_ID, KEY_NAME, KEY_COVER, KEY_CREATOR_NAME, KEY_CREATOR_AVATAR, KEY_CREATOR_ID, KEY_DESCRIPTION, KEY_SONGS
@@ -108,18 +121,16 @@ public class SongSheetParse implements ISpiderOperator {
                 for (int i = 0, len = songs.size(); i < len; i++) {
                     Song song = new Song();
                     song.setSource("netease");
+                    song.setDate(new Date());
                     JSONObject jsonObject = songs.getJSONObject(i);
                     JSONUtil songJsonUtil = JSONUtil.parseObject(jsonObject);
                     String[] songKeys = new String[]{
-                            KEY_SONG_ID, KEY_SONG_NAME, KEY_SONG_ALBUM_ID, KEY_SONG_ALBUM_NAME
+                            KEY_SONG_ID, KEY_SONG_NAME
                     };
                     Map<String, Object> songValueMap = songJsonUtil.getBatchValue(songKeys);
                     song.setId(StrUtils.objectToString(songValueMap.get(KEY_SONG_ID)));
                     song.setName(StrUtils.objectToString(songValueMap.get(KEY_SONG_NAME)));
-                    song.setAlbum(StrUtils.objectToString(songValueMap.get(KEY_SONG_ALBUM_NAME)));
-                    song.setAlbumId(StrUtils.objectToString(songValueMap.get(KEY_SONG_ALBUM_ID)));
                     songList.add(song);
-
                 }
                 this.songSheet.setSongs(songList);
             }
@@ -134,27 +145,47 @@ public class SongSheetParse implements ISpiderOperator {
         }
     }
 
-    public String getUrl() {
-        return this.url;
+    /**
+     * 设置请求对象
+     *
+     * @return
+     */
+    public Request getRequest() {
+        return  this.request;
     }
 
-    public Map<String, String> getParams() {
-        return this.params;
+    /**
+     * 获取请求对象
+     *
+     * @param request
+     * @return
+     */
+    public void setRequest(Request request) {
+        this.request = request;
     }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public void setParams(Map<String, String> params) {
-        this.params = params;
-    }
-
+    /**
+     * 回调
+     *
+     * @param callback
+     */
     public void addCallback(IParseCallback<SongSheet> callback) {
         if (ObjectUtils.allNotNull(callback)) {
             this.callbacks.add(callback);
         }
     }
 
-
+    /**
+     * 设置参数
+     *
+     * @param id
+     */
+    public void setParams(String id) {
+        if (!ObjectUtils.allNotNull(this.params)) {
+            this.params = new HashMap<String, String>();
+        }
+        if (ObjectUtils.allNotNull(id)) {
+            this.params.put("id",id);
+            this.params.put("n","1000");
+        }
+    }
 }

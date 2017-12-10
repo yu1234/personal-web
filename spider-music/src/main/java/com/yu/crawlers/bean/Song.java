@@ -1,27 +1,20 @@
 package com.yu.crawlers.bean;
 
+import java.util.Date;
+import java.util.List;
+
 /**
  * Created by yuliu on 2017/11/28 0028.
  */
-public class Song {
-    private String id;// 音乐ID
+public class Song extends BaseObject {
     private String name; // 音乐名字
-    private String artist;// 艺术家名字
-    private String artistId;// 艺术家id
-    private String album;// 专辑名字
-    private String albumId;// 专辑id
+    private List<Artist> artists;// 艺术家
+    private Album album;// 专辑名字
     private String source;// 音乐来源
-    private String cover;// 专辑图片
-    private String lyricId;// 歌词ID
+    private Lyric lyric;// 歌词
     private String url; // mp3链接
+    private Date date;//日期
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -31,19 +24,11 @@ public class Song {
         this.name = name;
     }
 
-    public String getArtist() {
-        return artist;
-    }
-
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
-    public String getAlbum() {
+    public Album getAlbum() {
         return album;
     }
 
-    public void setAlbum(String album) {
+    public void setAlbum(Album album) {
         this.album = album;
     }
 
@@ -55,20 +40,13 @@ public class Song {
         this.source = source;
     }
 
-    public String getCover() {
-        return cover;
+
+    public Lyric getLyric() {
+        return lyric;
     }
 
-    public void setCover(String cover) {
-        this.cover = cover;
-    }
-
-    public String getLyricId() {
-        return lyricId;
-    }
-
-    public void setLyricId(String lyricId) {
-        this.lyricId = lyricId;
+    public void setLyric(Lyric lyric) {
+        this.lyric = lyric;
     }
 
     public String getUrl() {
@@ -79,19 +57,20 @@ public class Song {
         this.url = url;
     }
 
-    public String getArtistId() {
-        return artistId;
+
+    public Date getDate() {
+        return date;
     }
 
-    public void setArtistId(String artistId) {
-        this.artistId = artistId;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
-    public String getAlbumId() {
-        return albumId;
+    public List<Artist> getArtists() {
+        return artists;
     }
 
-    public void setAlbumId(String albumId) {
-        this.albumId = albumId;
+    public void setArtists(List<Artist> artists) {
+        this.artists = artists;
     }
 }

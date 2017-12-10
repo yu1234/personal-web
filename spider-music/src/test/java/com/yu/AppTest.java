@@ -23,12 +23,7 @@ public class AppTest implements IParseCallback<List<String>> {
 
     @Test
     public void mainTest() {
-        Main.run();
-        SpiderMusic spiderMusic=  SpringUtil.getBean(SpiderMusic.class);
-        Map map=new HashMap();
-        map.put("id","94284266");
-        SongSheetParse playSheetParse=new SongSheetParse(map);
-        spiderMusic.run(playSheetParse);
+
 
     }
 

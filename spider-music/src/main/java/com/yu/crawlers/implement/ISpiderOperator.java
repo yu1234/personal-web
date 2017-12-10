@@ -1,6 +1,9 @@
 package com.yu.crawlers.implement;
 
+import cn.wanghaomiao.seimi.struct.Request;
 import cn.wanghaomiao.seimi.struct.Response;
+import com.yu.crawlers.bean.BaseObject;
+import com.yu.crawlers.bean.SongSheet;
 
 import java.util.Map;
 
@@ -9,18 +12,23 @@ import java.util.Map;
  */
 public interface ISpiderOperator {
 
-    //解析回调
+    /**
+     * 解析回调
+     *
+     * @param response
+     */
     void parse(Response response);
 
-    //获取爬虫url
-    String getUrl();
+    /**
+     * 设置请求对象
+     * @return
+     */
+    Request getRequest();
 
-    //获取参数
-    Map<String, String> getParams();
+    /**
+     * 获取请求对象
+     * @return
+     */
+    void setRequest(Request request);
 
-    //设置url
-    void setUrl(String url);
-
-    //设置参数
-    void setParams(Map<String, String>  params);
 }

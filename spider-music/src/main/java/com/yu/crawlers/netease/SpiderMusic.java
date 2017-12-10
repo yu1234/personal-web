@@ -3,6 +3,8 @@ package com.yu.crawlers.netease;
 import cn.wanghaomiao.seimi.annotation.Crawler;
 import cn.wanghaomiao.seimi.core.Seimi;
 import cn.wanghaomiao.seimi.def.BaseSeimiCrawler;
+import cn.wanghaomiao.seimi.http.HttpMethod;
+import cn.wanghaomiao.seimi.struct.Request;
 import cn.wanghaomiao.seimi.struct.Response;
 import com.yu.crawlers.implement.ISpiderOperator;
 import org.apache.commons.lang3.ObjectUtils;
@@ -18,12 +20,10 @@ public class SpiderMusic extends BaseSeimiCrawler {
     private static ISpiderOperator spiderOperator;
 
     public String[] startUrls() {
-        if (ObjectUtils.allNotNull(spiderOperator)) {
-            return getStartUrls(spiderOperator.getUrl(), spiderOperator.getParams());
-        } else {
-            return new String[0];
+        if (ObjectUtils.allNotNull(spiderOperator)&&ObjectUtils.anyNotNull(spiderOperator.getRequest())) {
+            this.push(spiderOperator.getRequest());
         }
-
+        return null;
 
     }
 
@@ -40,49 +40,9 @@ public class SpiderMusic extends BaseSeimiCrawler {
      * @param
      */
     public void run(ISpiderOperator spiderOperator) {
-        SpiderMusic.spiderOperator=spiderOperator;
-        s.goRun( "SpiderMusic");
+        SpiderMusic.spiderOperator = spiderOperator;
+        s.goRun(false, "SpiderMusic");
 
     }
 
-
-    /**
-     * 参数拼接
-     *
-     * @return
-     */
-    private String spliceParams(Map<String, String> params) {
-        StringBuffer sb = new StringBuffer("");
-        if (ObjectUtils.allNotNull(params)) {
-            for (String key : params.keySet()) {
-                String value = params.get(key);
-                if (ObjectUtils.allNotNull(key, value)) {
-                    sb.append(key + "=" + value + "&");
-                }
-            }
-        }
-        return sb.toString();
-    }
-
-
-    /**
-     * 设置爬取路径
-     *
-     * @param params
-     */
-    private String[] getStartUrls(String url, Map<String, String>... params) {
-        String[] r = new String[0];
-        if (ObjectUtils.allNotNull(url)) {
-            if (ObjectUtils.allNotNull(params) && params.length > 0) {
-                for (Map<String, String> param : params) {
-                    String paramStr = this.spliceParams(param);
-                    r = new String[]{url + "?" + paramStr};
-                }
-            } else {
-                r = new String[]{url};
-            }
-        }
-        return r;
-
-    }
 }

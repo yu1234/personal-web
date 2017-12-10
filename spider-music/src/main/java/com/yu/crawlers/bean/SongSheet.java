@@ -2,30 +2,24 @@ package com.yu.crawlers.bean;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by yuliu on 2017/11/28 0028.
  */
-public class SongSheet {
+public class SongSheet extends BaseObject {
     private String source;// 歌单来源
-    private String id;// 歌单 id
     private String name;//歌单名称
     private String cover;//封面
     private String creatorName;// 列表创建者名字
     private String creatorAvatar;// 列表创建者头像
     private String creatorId;
+    private Date date;
     @DBRef
     private List<Song> songs;
     private String description;//描述
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -89,5 +83,13 @@ public class SongSheet {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

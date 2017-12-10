@@ -9,11 +9,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Created by yuliu on 2017/11/27 0027.
  */
 public class Main {
+    private static ApplicationContext applicationContext;
 
-
-    public static void run() {
-        if (!ObjectUtils.allNotNull(SpringUtil.applicationContext)) {
-            new ClassPathXmlApplicationContext("application.xml");
+    public synchronized static void run() {
+        if (!ObjectUtils.allNotNull(Main.applicationContext)) {
+            Main.applicationContext = new ClassPathXmlApplicationContext("spider-music-application.xml");
         }
     }
 }

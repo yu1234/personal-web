@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 
 import java.util.HashMap;
@@ -62,10 +63,46 @@ public class JSONUtil {
                     if (ObjectUtils.allNotNull(jsonObjectTemp)) {
                         String k = keys[i];
                         if (i == (len - 1)) {
-                            value = jsonObjectTemp.getObject(k, clazz);
+                            if (k.endsWith("]")) {
+                                String temp = k;
+                                k = k.substring(0, k.length() - 2);
+                                String[] aKeys = k.split("\\[");
+                                if (ObjectUtils.allNotNull(aKeys) && aKeys.length > 1 && NumberUtils.isDigits(aKeys[1])) {
+                                    int index = NumberUtils.toInt(aKeys[1]);
+                                    JSONArray jsonArray = jsonObjectTemp.getJSONArray(aKeys[0]);
+                                    if (index < jsonArray.size()) {
+                                        value = jsonArray.getJSONObject(index).getObject(k, clazz);
+                                    } else {
+                                        value = jsonObjectTemp.getObject(k, clazz);
+                                    }
+                                } else {
+                                    value = jsonObjectTemp.getObject(k, clazz);
+                                }
+                            } else {
+                                value = jsonObjectTemp.getObject(k, clazz);
+                            }
                         } else {
-                            jsonObjectTemp = jsonObjectTemp.getJSONObject(k);
+                            if (k.endsWith("]")) {
+                                String temp = k;
+                                k = k.substring(0, k.length() - 1);
+                                String[] aKeys = k.split("\\[");
+                                if (ObjectUtils.allNotNull(aKeys) && aKeys.length > 1 && NumberUtils.isDigits(aKeys[1])) {
+                                    int index = NumberUtils.toInt(aKeys[1]);
+                                    JSONArray jsonArray = jsonObjectTemp.getJSONArray(aKeys[0]);
+                                    if (index < jsonArray.size()) {
+                                        jsonObjectTemp = jsonArray.getJSONObject(index);
+                                    } else {
+                                        jsonObjectTemp = jsonObjectTemp.getJSONObject(temp);
+                                    }
+                                } else {
+                                    jsonObjectTemp = jsonObjectTemp.getJSONObject(temp);
+                                }
+                            } else {
+                                jsonObjectTemp = jsonObjectTemp.getJSONObject(k);
+                            }
+
                         }
+
                     }
 
                 }
