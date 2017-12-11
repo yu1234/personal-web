@@ -16,9 +16,11 @@ public class SongSheet extends BaseObject {
     private String creatorAvatar;// 列表创建者头像
     private String creatorId;
     private Date date;
+    private String description;//描述
+    private int type;//歌单类型
     @DBRef
     private List<Song> songs;
-    private String description;//描述
+
 
 
     public String getName() {
@@ -91,5 +93,13 @@ public class SongSheet extends BaseObject {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

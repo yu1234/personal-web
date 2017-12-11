@@ -1,7 +1,6 @@
 package com.yu.music.player.dao.repositories;
 
 import com.yu.crawlers.bean.Song;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 /**

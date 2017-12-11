@@ -23,7 +23,7 @@ public class AppTest implements IParseCallback<List<String>> {
 
     @Test
     public void mainTest() {
-
+        Main.run();
 
     }
 

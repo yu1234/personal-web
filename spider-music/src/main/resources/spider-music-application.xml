@@ -3,7 +3,11 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mongo="http://www.springframework.org/schema/data/mongo"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+    <!-- task任务扫描注解 -->
+    <task:annotation-driven/>
+    <!-- 扫描位置 -->
     <context:component-scan base-package="com.yu.crawlers"/>
     <!-- 获取配置资源 -->
     <context:property-placeholder location="classpath:mongodb.properties"/>
@@ -27,16 +31,4 @@
     </bean>
     <mongo:repositories base-package="com.yu.crawlers.dao.repositories" />
 
-    <bean id="music163.SpiderMusic" class="com.yu.crawlers.netease.SpiderMusic">
-        <!--<property name="neteaseUrlMap">
-            <map>
-                <entry key="playList" value="http://music.163.com/api/v3/playlist/detail"/>
-                <entry key="song" value="http://music.163.com/api/v3/song/detail"/>
-                <entry key="url" value="http://music.163.com/api/song/enhance/player/url"/>
-                <entry key="artist" value="http://music.163.com/api/v1/artist"/>
-                <entry key="album" value="http://music.163.com/api/v1/album"/>
-                <entry key="lyric" value="http://music.163.com/api/song/lyric"/>
-            </map>
-        </property>-->
-    </bean>
 </beans>

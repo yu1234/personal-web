@@ -10,6 +10,7 @@ import com.yu.crawlers.bean.*;
 import com.yu.crawlers.dao.repositories.SongRepository;
 import com.yu.crawlers.dao.repositories.SongSheetRepository;
 import com.yu.crawlers.implement.IParseCallback;
+import com.yu.crawlers.implement.IRequestErrorCallback;
 import com.yu.crawlers.implement.ISpiderOperator;
 import com.yu.crawlers.utils.SpringUtil;
 import com.yu.utils.JSONUtil;
@@ -32,22 +33,20 @@ public class SongParse implements ISpiderOperator {
     private SongRepository songRepository;
     private List<IParseCallback<List<Song>>> callbacks;
 
-    private Request request;
+    private IRequestErrorCallback requestErrorCallback;
+
+    private Request[] requests;
     private String url = "http://music.163.com/api/v3/song/detail";
-    private Map<String, String> params;
     private List<Song> songs;
 
-    public SongParse() {
-        init();
-    }
 
     public SongParse(String... ids) {
         this.setParams(ids);
         init();
     }
 
-    public SongParse(Request request) {
-        this.request = request;
+    public SongParse(Request... requests) {
+        this.requests = requests;
         init();
     }
 
@@ -57,17 +56,12 @@ public class SongParse implements ISpiderOperator {
     private void init() {
         this.songRepository = SpringUtil.getBean(SongRepository.class);
         this.callbacks = new ArrayList<IParseCallback<List<Song>>>();
-        //初始化参数
-        if (!ObjectUtils.allNotNull(this.params)) {
-            this.params = new HashMap<String, String>();
-        }
+
         //初始化请求对象
-        if (ObjectUtils.allNotNull(this.request)) {
-            this.request.setCallBack("start");
-        } else {
-            this.request = Request.build(url, "start");
-            this.request.setParams(this.params);
-            this.request.setHttpMethod(HttpMethod.POST);
+        if (ObjectUtils.allNotNull(this.requests) && this.requests.length > 0) {
+            for (Request request : this.requests) {
+                request.setCallBack("start");
+            }
         }
     }
 
@@ -137,8 +131,8 @@ public class SongParse implements ISpiderOperator {
      *
      * @return
      */
-    public Request getRequest() {
-        return this.request;
+    public Request[] getRequests() {
+        return this.requests;
     }
 
     /**
@@ -146,8 +140,26 @@ public class SongParse implements ISpiderOperator {
      *
      * @return
      */
-    public void setRequest(Request requests) {
-        this.request = request;
+    public void setRequests(Request... requests) {
+        this.requests = requests;
+    }
+
+    /**
+     * 获取请求错误回调
+     *
+     * @return
+     */
+    public IRequestErrorCallback getRequestErrorCallback() {
+        return this.requestErrorCallback;
+    }
+
+    /**
+     * 设置请求错误回调
+     *
+     * @return
+     */
+    public void setRequestErrorCallback(IRequestErrorCallback requestErrorCallback) {
+        this.requestErrorCallback=requestErrorCallback;
     }
 
 
@@ -157,9 +169,6 @@ public class SongParse implements ISpiderOperator {
      * @param ids
      */
     public void setParams(String... ids) {
-        if (!ObjectUtils.allNotNull(this.params)) {
-            this.params = new HashMap<String, String>();
-        }
         if (ObjectUtils.allNotNull(ids)) {
             List<Map<String, String>> list = new ArrayList<Map<String, String>>();
             for (String id : ids) {
@@ -167,7 +176,12 @@ public class SongParse implements ISpiderOperator {
                 map.put("id", id);
                 list.add(map);
             }
-            this.params.put("c", JSON.toJSONString(list));
+            Map params = new HashMap<String, String>();
+            params.put("c", JSON.toJSONString(list));
+            Request request = Request.build(url, "start");
+            request.setParams(params);
+            request.setHttpMethod(HttpMethod.POST);
+            this.requests = new Request[]{request};
         }
     }
 

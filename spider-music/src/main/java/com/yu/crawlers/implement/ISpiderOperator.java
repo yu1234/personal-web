@@ -23,12 +23,23 @@ public interface ISpiderOperator {
      * 设置请求对象
      * @return
      */
-    Request getRequest();
+    Request[] getRequests();
 
     /**
      * 获取请求对象
      * @return
      */
-    void setRequest(Request request);
+    void setRequests(Request... request);
+
+    /**
+     * 获取请求错误回调
+     * @return
+     */
+    IRequestErrorCallback getRequestErrorCallback();
+    /**
+     * 设置请求错误回调
+     * @return
+     */
+    void setRequestErrorCallback(IRequestErrorCallback requestErrorCallback);
 
 }

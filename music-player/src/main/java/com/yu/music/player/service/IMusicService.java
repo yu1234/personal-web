@@ -1,8 +1,5 @@
-package com.yu.music.player.Service;
+package com.yu.music.player.service;
 
-import com.yu.crawlers.bean.Song;
-import com.yu.crawlers.bean.SongSheet;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -17,4 +14,8 @@ public interface IMusicService {
      * @return
      */
     Mono<String> getSongSheet(String id);
+
+
+
+
 }
