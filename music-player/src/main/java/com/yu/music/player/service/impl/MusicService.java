@@ -18,9 +18,11 @@ import com.yu.music.player.dao.repositories.SongSheetRepository;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by yuliu on 2017/12/7 0007.
@@ -32,58 +34,70 @@ public class MusicService implements IMusicService {
     @Autowired
     private SongRepository songRepository;
 
-    SpiderMusic spiderMusic = SpringUtil.getBean(SpiderMusic.class);
+    private ITimerService timerService=SpringUtil.getBean(TimerService.class);
 
 
     @Override
-    public Mono getSongById(String id) {
-
-        Mono mono = Mono.create(s -> {
-            if (ObjectUtils.allNotNull(spiderMusic)) {
-                SongParse playSheetParse = new SongParse(id);
-                playSheetParse.addCallback(new IParseCallback<List<Song>>() {
-                    @Override
-                    public void successCallback(List<Song> songs) {
-                        s.success(songs);
-                    }
-                });
-                spiderMusic.run(playSheetParse);
-            }
+    public Mono<Song> getSongById(String id) {
+        Mono<Song> mono = Mono.create(s -> {
+            SongParse playSheetParse = new SongParse(id);
+            playSheetParse.setCallback(songs -> {
+                if (ObjectUtils.allNotNull(songs) && songs.size() > 0) {
+                    s.success(songs.get(0));
+                }
+            });
+            SpiderMusic.run(playSheetParse);
         });
+        return this.songRepository.findById(id).switchIfEmpty(mono);
 
-        return mono;
+
+    }
+
+
+    /**
+     * 根据type 获取歌单
+     *
+     * @param type
+     * @return
+     */
+    @Override
+    public Flux<SongSheet> getSongSheetByType(int type) {
+        return this.songSheetRepository.findByType(type);
     }
 
     /**
-     * 获取歌单列表
+     * 根据歌单id 获取歌单歌曲
      *
      * @param id
      * @return
      */
     @Override
-    public Mono<String> getSongSheet(String id) {
-        Song song = new Song();
-        song.setId("2");
-        song.setName("测试");
-        song.setDate(new Date());
-        song.setSource("eeeee");
-        List<Song> songs=new ArrayList<>();
-        songs.add(song);
-        this.songRepository.saveAll(songs);
-        Mono<String> mono;
-        mono = songSheetRepository.findById(id).map(v -> JSON.toJSONString(v)).switchIfEmpty(Mono.create(s -> {
-            if (ObjectUtils.allNotNull(spiderMusic)) {
-                SongSheetParse songSheetParse = new SongSheetParse(SongSheetType.PLAY_LIST, id);
-                songSheetParse.addCallback(new IParseCallback<SongSheet>() {
-                    @Override
-                    public void successCallback(SongSheet songSheet) {
-                        s.success(JSON.toJSONString(songSheet));
-                    }
-                });
-                spiderMusic.run(songSheetParse);
-            }
-        }));
-        return mono;
+    public Flux<Song> getSongsBySongSheetId(String id) {
+        SongSheet songSheet = this.getSongSheetById(id).block();
+        if (ObjectUtils.allNotNull(songSheet) && ObjectUtils.allNotNull(songSheet.getSongs()) && !songSheet.getSongs().isEmpty()) {
+            List<Mono<Song>> monos = songSheet.getSongs().stream().map(songId -> this.getSongById(songId)).collect(Collectors.toList());
+            return Flux.concat(monos);
+        }
+        return Flux.empty();
     }
+
+    /**
+     * 根据歌单id 获取歌单
+     *
+     * @param id
+     * @return
+     */
+    public Mono<SongSheet> getSongSheetById(String id) {
+        Mono<SongSheet> mono = Mono.create(s -> {
+            SongSheetParse songSheetParse = new SongSheetParse(id);
+            songSheetParse.setCallback(songSheet -> s.success(songSheet));
+            SpiderMusic.run(songSheetParse);
+        });
+        return this.songSheetRepository.findById(id).switchIfEmpty(mono);
+    }
+
+    /**
+     *
+     */
 
 }

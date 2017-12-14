@@ -3,27 +3,26 @@ package com.yu.crawlers.netease.parse;
 import cn.wanghaomiao.seimi.http.HttpMethod;
 import cn.wanghaomiao.seimi.struct.Request;
 import cn.wanghaomiao.seimi.struct.Response;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.yu.crawlers.bean.Album;
 import com.yu.crawlers.bean.Song;
 import com.yu.crawlers.bean.SongSheet;
 import com.yu.crawlers.dao.repositories.SongRepository;
 import com.yu.crawlers.dao.repositories.SongSheetRepository;
+import com.yu.crawlers.implement.IParseCallback;
 import com.yu.crawlers.implement.IRequestErrorCallback;
 import com.yu.crawlers.implement.ISpiderOperator;
-import com.yu.crawlers.implement.IParseCallback;
 import com.yu.crawlers.implement.SongSheetType;
-import com.yu.utils.JSONUtil;
 import com.yu.crawlers.utils.SpringUtil;
+import com.yu.utils.JSONUtil;
 import com.yu.utils.StrUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Created by yuliu on 2017/12/5 0005.
@@ -45,8 +44,8 @@ public class SongSheetParse implements ISpiderOperator {
 
     private SongSheet songSheet;
 
-    private List<IParseCallback<SongSheet>> callbacks;
-    private IRequestErrorCallback requestErrorCallback;
+    private Consumer<SongSheet> callback;
+    private Consumer<Request> requestErrorCallback;
 
     private SongSheetRepository songSheetRepository;
 
@@ -59,7 +58,10 @@ public class SongSheetParse implements ISpiderOperator {
         this.setParams(type, ids);
         init();
     }
-
+    public SongSheetParse(String... ids) {
+        this.setParams(SongSheetType.PLAY_LIST, ids);
+        init();
+    }
     public SongSheetParse(Request... requests) {
         this.requests = requests;
         init();
@@ -68,7 +70,6 @@ public class SongSheetParse implements ISpiderOperator {
     private void init() {
         this.songSheetRepository = SpringUtil.getBean(SongSheetRepository.class);
         this.songRepository = SpringUtil.getBean(SongRepository.class);
-        this.callbacks = new ArrayList<IParseCallback<SongSheet>>();
 
         //初始化请求对象
         if (ObjectUtils.allNotNull(this.requests) && this.requests.length > 0) {
@@ -94,6 +95,9 @@ public class SongSheetParse implements ISpiderOperator {
                     KEY_ID, KEY_NAME, KEY_COVER, KEY_CREATOR_NAME, KEY_CREATOR_AVATAR, KEY_CREATOR_ID, KEY_DESCRIPTION, KEY_SONGS
             };
             Map<String, Object> valueMap = jsonUtil.getBatchValue(keys);
+
+            //获取id
+            this.songSheet.setId(StrUtils.objectToString(valueMap.get(KEY_ID)));
             //获取歌单类型
             int type = SongSheetType.PLAY_LIST.getValue();
             if (ObjectUtils.allNotNull(response.getMeta()) && ObjectUtils.allNotNull(response.getMeta().get("type"))) {
@@ -101,8 +105,6 @@ public class SongSheetParse implements ISpiderOperator {
                 type = NumberUtils.toInt(s);
             }
             this.songSheet.setType(type);
-            //获取id
-            this.songSheet.setId(StrUtils.objectToString(valueMap.get(KEY_ID)));
             //获取名称
             this.songSheet.setName(StrUtils.objectToString(valueMap.get(KEY_NAME)));
             //获取封面路径
@@ -118,7 +120,7 @@ public class SongSheetParse implements ISpiderOperator {
             //获取歌单
             JSONArray songs = (JSONArray) valueMap.get(KEY_SONGS);
             if (ObjectUtils.allNotNull(songs)) {
-                List<Song> songList = new ArrayList<Song>();
+                List<String> songList = new ArrayList<String>();
                 for (int i = 0, len = songs.size(); i < len; i++) {
                     Song song = new Song();
                     song.setSource("netease");
@@ -131,17 +133,16 @@ public class SongSheetParse implements ISpiderOperator {
                     Map<String, Object> songValueMap = songJsonUtil.getBatchValue(songKeys);
                     song.setId(StrUtils.objectToString(songValueMap.get(KEY_SONG_ID)));
                     song.setName(StrUtils.objectToString(songValueMap.get(KEY_SONG_NAME)));
-                    songList.add(song);
+                    songList.add(song.getId());
                 }
                 this.songSheet.setSongs(songList);
             }
-            //数据保存
+            //查询是否存在
             this.songSheetRepository.save(this.songSheet);
-            this.songRepository.saveAll(this.songSheet.getSongs());
-            if (ObjectUtils.allNotNull(this.callbacks) && this.callbacks.size() > 0) {
-                for (IParseCallback<SongSheet> callback : this.callbacks) {
-                    callback.successCallback(this.songSheet);
-                }
+            if (ObjectUtils.allNotNull(this.callback)) {
+
+                    this.callback.accept(this.songSheet);
+
             }
         }
     }
@@ -170,9 +171,9 @@ public class SongSheetParse implements ISpiderOperator {
      *
      * @param callback
      */
-    public void addCallback(IParseCallback<SongSheet> callback) {
+    public void setCallback(Consumer<SongSheet> callback) {
         if (ObjectUtils.allNotNull(callback)) {
-            this.callbacks.add(callback);
+            this.callback=callback;
         }
     }
 
@@ -203,7 +204,7 @@ public class SongSheetParse implements ISpiderOperator {
      *
      * @return
      */
-    public IRequestErrorCallback getRequestErrorCallback() {
+    public Consumer<Request> getRequestErrorCallback() {
         return this.requestErrorCallback;
     }
 
@@ -212,7 +213,7 @@ public class SongSheetParse implements ISpiderOperator {
      *
      * @return
      */
-    public void setRequestErrorCallback(IRequestErrorCallback requestErrorCallback) {
+    public void setRequestErrorCallback(Consumer<Request> requestErrorCallback) {
         this.requestErrorCallback=requestErrorCallback;
     }
 

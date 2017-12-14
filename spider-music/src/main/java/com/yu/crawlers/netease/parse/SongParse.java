@@ -12,6 +12,7 @@ import com.yu.crawlers.dao.repositories.SongSheetRepository;
 import com.yu.crawlers.implement.IParseCallback;
 import com.yu.crawlers.implement.IRequestErrorCallback;
 import com.yu.crawlers.implement.ISpiderOperator;
+import com.yu.crawlers.netease.SpiderMusic;
 import com.yu.crawlers.utils.SpringUtil;
 import com.yu.utils.JSONUtil;
 import com.yu.utils.StrUtils;
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Created by yuliu on 2017/12/7 0007.
@@ -31,9 +33,9 @@ public class SongParse implements ISpiderOperator {
     private final static String KEY_ALBUM = "al";
 
     private SongRepository songRepository;
-    private List<IParseCallback<List<Song>>> callbacks;
+    private Consumer<List<Song>> callback;
 
-    private IRequestErrorCallback requestErrorCallback;
+    private Consumer<Request> requestErrorCallback;
 
     private Request[] requests;
     private String url = "http://music.163.com/api/v3/song/detail";
@@ -55,7 +57,6 @@ public class SongParse implements ISpiderOperator {
      */
     private void init() {
         this.songRepository = SpringUtil.getBean(SongRepository.class);
-        this.callbacks = new ArrayList<IParseCallback<List<Song>>>();
 
         //初始化请求对象
         if (ObjectUtils.allNotNull(this.requests) && this.requests.length > 0) {
@@ -72,15 +73,17 @@ public class SongParse implements ISpiderOperator {
      */
     public void parse(Response response) {
         String content = response.getContent();
+        String[] ids = null;
         if (!StringUtils.isAllBlank(content)) {
             this.songs = new ArrayList<Song>();
             JSONUtil jsonUtil = JSONUtil.parseObject(content);
             JSONArray jsonArray = jsonUtil.get(KEY_ROOT, JSONArray.class);
             if (ObjectUtils.allNotNull(jsonArray)) {
+                ids = new String[jsonArray.size()];
                 for (int i = 0, len = jsonArray.size(); i < len; i++) {
                     jsonUtil.setJsonObject(jsonArray.getJSONObject(i));
                     String[] keys = new String[]{
-                            KEY_ARTIST, KEY_ALBUM, KEY_ID, KEY_ARTIST
+                            KEY_ARTIST, KEY_ALBUM, KEY_ID, KEY_ARTIST,KEY_NAME
                     };
                     Map<String, Object> valueMap = jsonUtil.getBatchValue(keys);
                     Song song = new Song();
@@ -111,19 +114,19 @@ public class SongParse implements ISpiderOperator {
                         lyric.setId(song.getId());
                         song.setLyric(lyric);
                     }
-
+                    ids[i] = song.getId();
                     this.songs.add(song);
                 }
             }
         }
+        //保存数据
         if (ObjectUtils.allNotNull(this.songs) && !this.songs.isEmpty()) {
             this.songRepository.saveAll(this.songs);
         }
-        if (ObjectUtils.allNotNull(this.callbacks) && this.callbacks.size() > 0) {
-            for (IParseCallback<List<Song>> callback : this.callbacks) {
-                callback.successCallback(this.songs);
-            }
-        }
+        //获取歌曲路径
+        SongUrlParse songUrlParse = new SongUrlParse(ids);
+        songUrlParse.setCallback(this.callback);
+        SpiderMusic.run(songUrlParse);
     }
 
     /**
@@ -149,7 +152,7 @@ public class SongParse implements ISpiderOperator {
      *
      * @return
      */
-    public IRequestErrorCallback getRequestErrorCallback() {
+    public Consumer<Request> getRequestErrorCallback() {
         return this.requestErrorCallback;
     }
 
@@ -158,8 +161,8 @@ public class SongParse implements ISpiderOperator {
      *
      * @return
      */
-    public void setRequestErrorCallback(IRequestErrorCallback requestErrorCallback) {
-        this.requestErrorCallback=requestErrorCallback;
+    public void setRequestErrorCallback(Consumer<Request> requestErrorCallback) {
+        this.requestErrorCallback = requestErrorCallback;
     }
 
 
@@ -190,9 +193,10 @@ public class SongParse implements ISpiderOperator {
      *
      * @param callback
      */
-    public void addCallback(IParseCallback<List<Song>> callback) {
+    public void setCallback(Consumer<List<Song>> callback) {
         if (ObjectUtils.allNotNull(callback)) {
-            this.callbacks.add(callback);
+            this.callback = callback;
         }
+
     }
 }

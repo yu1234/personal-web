@@ -48,7 +48,7 @@ public class SpiderMusic extends BaseSeimiCrawler {
      *
      * @param
      */
-    public void run(ISpiderOperator spiderOperator) {
+    public static void run(ISpiderOperator spiderOperator) {
         SpiderMusic.spiderOperator = spiderOperator;
         s.goRun(false, "SpiderMusic");
 
@@ -58,7 +58,7 @@ public class SpiderMusic extends BaseSeimiCrawler {
     public void handleErrorRequest(Request request) {
         super.handleErrorRequest(request);
         if(ObjectUtils.allNotNull(spiderOperator)&&ObjectUtils.allNotNull(spiderOperator.getRequestErrorCallback())){
-            spiderOperator.getRequestErrorCallback().errorCallback(request);
+            spiderOperator.getRequestErrorCallback().accept(request);
         }
     }
 }

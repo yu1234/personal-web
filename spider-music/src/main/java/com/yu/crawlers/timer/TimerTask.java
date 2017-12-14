@@ -16,7 +16,7 @@ public class TimerTask {
     /**
      * 每天凌晨2点更新网易排行榜
      */
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 42 0 * * ?")
     public void  updateTopListTask(){
         this.timerService.updateTopList();
     }

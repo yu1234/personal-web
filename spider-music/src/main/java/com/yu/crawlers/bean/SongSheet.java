@@ -1,6 +1,7 @@
 package com.yu.crawlers.bean;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
 import java.util.List;
@@ -18,8 +19,7 @@ public class SongSheet extends BaseObject {
     private Date date;
     private String description;//描述
     private int type;//歌单类型
-    @DBRef
-    private List<Song> songs;
+    private List<String> songs;
 
 
 
@@ -63,11 +63,11 @@ public class SongSheet extends BaseObject {
         this.creatorId = creatorId;
     }
 
-    public List<Song> getSongs() {
+    public List<String> getSongs() {
         return songs;
     }
 
-    public void setSongs(List<Song> songs) {
+    public void setSongs(List<String> songs) {
         this.songs = songs;
     }
 

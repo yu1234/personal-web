@@ -15,7 +15,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring.version>5.0.2.RELEASE</spring.version>
+        <java.version>9</java.version>
     </properties>
 
     <dependencies>
@@ -88,8 +90,18 @@
             <artifactId>utils</artifactId>
             <version>1.0.0</version>
         </dependency>
-
-
-
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -32,18 +32,11 @@ public class TimerService implements ITimerService {
      * 更新网易排行榜
      */
     public void updateTopList() {
-        SongSheetParse songSheetParse = new SongSheetParse(SongSheetType.TOP_LIST,topList);
+        SongSheetParse songSheetParse = new SongSheetParse(SongSheetType.TOP_LIST, topList);
 
-        songSheetParse.addCallback(new IParseCallback<SongSheet>() {
-            public void successCallback(SongSheet songSheet) {
-                System.out.println("---------------------更新网易排行榜:"+songSheet.getName()+"  "+new Date().toLocaleString()+"-----------------------------");
-            }
-        });
-        songSheetParse.setRequestErrorCallback(new IRequestErrorCallback() {
-            public void errorCallback(Request request) {
-                System.out.println("---------------------更新失败"+ JSON.toJSONString(request.getParams())+"  "+new Date().toLocaleString()+"-----------------------------");
-            }
-        });
+        songSheetParse.setCallback(songSheet -> System.out.println("---------------------更新网易排行榜:" + songSheet.getName() + "  " + new Date().toLocaleString() + "-----------------------------"));
+
+        songSheetParse.setRequestErrorCallback(request -> System.out.println("---------------------更新失败" + JSON.toJSONString(request.getParams()) + "  " + new Date().toLocaleString() + "-----------------------------"));
         spiderMusic.run(songSheetParse);
     }
 }
