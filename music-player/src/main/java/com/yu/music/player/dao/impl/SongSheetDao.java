@@ -1,7 +1,7 @@
 package com.yu.music.player.dao.impl;
 
 
-import com.yu.crawlers.bean.SongSheet;
+import com.yu.spider.music.bean.SongSheet;
 import com.yu.music.player.dao.ISongSheetDao;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,28 +1,24 @@
 package com.yu.music.player.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.yu.crawlers.bean.Song;
-import com.yu.crawlers.bean.SongSheet;
-import com.yu.crawlers.implement.IParseCallback;
-import com.yu.crawlers.implement.SongSheetType;
-import com.yu.crawlers.netease.SpiderMusic;
-import com.yu.crawlers.netease.parse.SongParse;
-import com.yu.crawlers.netease.parse.SongSheetParse;
-import com.yu.crawlers.servic.ITimerService;
-import com.yu.crawlers.servic.impl.TimerService;
-import com.yu.crawlers.utils.SpringUtil;
+import com.yu.music.player.dao.ISongDao;
 import com.yu.music.player.dao.repositories.SongRepository;
-import com.yu.music.player.service.IMusicService;
-import com.yu.music.player.dao.ISongSheetDao;
 import com.yu.music.player.dao.repositories.SongSheetRepository;
+import com.yu.music.player.service.IMusicService;
+import com.yu.spider.music.bean.Lyric;
+import com.yu.spider.music.bean.Song;
+import com.yu.spider.music.bean.SongSheet;
+import com.yu.spider.music.netease.webmagic.PageProcessorMain;
+import com.yu.spider.music.netease.webmagic.pageprocessor.SongLyricPageProcessor;
+import com.yu.spider.music.netease.webmagic.pageprocessor.SongPageProcessor;
+import com.yu.spider.music.netease.webmagic.pageprocessor.SongSheetPageProcessor;
+import com.yu.spider.music.netease.webmagic.pageprocessor.SongUrlPageProcessor;
+import com.yu.utils.IoUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by yuliu on 2017/12/7 0007.
@@ -33,20 +29,20 @@ public class MusicService implements IMusicService {
     private SongSheetRepository songSheetRepository;
     @Autowired
     private SongRepository songRepository;
-
-    private ITimerService timerService=SpringUtil.getBean(TimerService.class);
+    @Autowired
+    private ISongDao songDao;
 
 
     @Override
     public Mono<Song> getSongById(String id) {
         Mono<Song> mono = Mono.create(s -> {
-            SongParse playSheetParse = new SongParse(id);
-            playSheetParse.setCallback(songs -> {
+            SongPageProcessor songPageProcessor = new SongPageProcessor(id);
+            songPageProcessor.setCallback(songs -> {
                 if (ObjectUtils.allNotNull(songs) && songs.size() > 0) {
                     s.success(songs.get(0));
                 }
             });
-            SpiderMusic.run(playSheetParse);
+            PageProcessorMain.run(songPageProcessor);
         });
         return this.songRepository.findById(id).switchIfEmpty(mono);
 
@@ -73,12 +69,9 @@ public class MusicService implements IMusicService {
      */
     @Override
     public Flux<Song> getSongsBySongSheetId(String id) {
-        SongSheet songSheet = this.getSongSheetById(id).block();
-        if (ObjectUtils.allNotNull(songSheet) && ObjectUtils.allNotNull(songSheet.getSongs()) && !songSheet.getSongs().isEmpty()) {
-            List<Mono<Song>> monos = songSheet.getSongs().stream().map(songId -> this.getSongById(songId)).collect(Collectors.toList());
-            return Flux.concat(monos);
-        }
-        return Flux.empty();
+        return this.getSongSheetById(id)
+                .map(songSheet -> songSheet.getSongs())
+                .flatMapMany(songIds -> this.songDao.findSongsBySongSheetId(songIds.toArray(new String[songIds.size()])));
     }
 
     /**
@@ -89,15 +82,64 @@ public class MusicService implements IMusicService {
      */
     public Mono<SongSheet> getSongSheetById(String id) {
         Mono<SongSheet> mono = Mono.create(s -> {
-            SongSheetParse songSheetParse = new SongSheetParse(id);
-            songSheetParse.setCallback(songSheet -> s.success(songSheet));
-            SpiderMusic.run(songSheetParse);
+            SongSheetPageProcessor songSheetPageProcessor = new SongSheetPageProcessor(id);
+            songSheetPageProcessor.setCallback(songSheet -> s.success(songSheet));
+            PageProcessorMain.run(songSheetPageProcessor);
         });
         return this.songSheetRepository.findById(id).switchIfEmpty(mono);
     }
 
     /**
+     * 根据歌曲id 获取最新url
      *
+     * @param id
+     * @return
      */
+    @Override
+    public Mono<String> getUrlBySongId(String id) {
+        Mono<String> mono = Mono.create(s -> {
+            SongUrlPageProcessor songUrlPageProcessor = new SongUrlPageProcessor(id);
+            songUrlPageProcessor.setCallback(urlMap -> {
+                if (urlMap.get(id) != null) {
+                    s.success(JSON.toJSONString(urlMap.get(id)));
+                }
+
+            });
+            PageProcessorMain.run(songUrlPageProcessor);
+        });
+        return this.songRepository.findById(id).flatMap(song -> {
+            if (IoUtils.existsUrl(song.getUrl())) {
+                return Mono.create(s -> s.success(JSON.toJSONString(song.getUrl())));
+            } else {
+                return mono;
+            }
+        }).switchIfEmpty(mono);
+    }
+
+    /**
+     * 根据歌词id 获取歌词
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public Mono<Lyric> getLyricByLyricId(String id) {
+        Mono<Lyric> mono = Mono.create(s -> {
+            SongLyricPageProcessor songLyricPageProcessor = new SongLyricPageProcessor(id);
+            songLyricPageProcessor.setCallback(map -> {
+                if (map.get(id) != null) {
+                    s.success(map.get(id));
+                }
+            });
+            PageProcessorMain.run(songLyricPageProcessor);
+        });
+        return this.songRepository.findById(id).flatMap(song -> {
+            if (ObjectUtils.allNotNull(song.getLyric())&&ObjectUtils.allNotNull(song.getLyric().getSourceLyric())) {
+                return Mono.create(s -> s.success(song.getLyric()));
+            } else {
+                return mono;
+            }
+        }).switchIfEmpty(mono);
+    }
 
 }

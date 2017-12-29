@@ -8,7 +8,7 @@
     <!-- task任务扫描注解 -->
     <task:annotation-driven/>
     <!-- 扫描位置 -->
-    <context:component-scan base-package="com.yu.crawlers"/>
+    <context:component-scan base-package="com.yu.spider.music"/>
     <!-- 获取配置资源 -->
     <context:property-placeholder location="classpath:mongodb.properties"/>
     <mongo:mongo-client id="mongo" host="${mongo.host}" port="${mongo.port} " credentials="${mongo.user}:${mongo.password}@${mongo.dbName}">
@@ -29,6 +29,6 @@
         <constructor-arg ref="mongo"/>
         <constructor-arg name="databaseName" value="${mongo.dbName}"/>
     </bean>
-    <mongo:repositories base-package="com.yu.crawlers.dao.repositories" />
+    <mongo:repositories base-package="com.yu.spider.music.dao.repositories" />
 
 </beans>

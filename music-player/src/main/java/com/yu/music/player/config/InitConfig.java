@@ -1,9 +1,8 @@
 package com.yu.music.player.config;
 
 
-import com.yu.crawlers.Main;
+import com.yu.spider.music.Main;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 

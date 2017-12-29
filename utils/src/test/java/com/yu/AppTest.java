@@ -1,5 +1,7 @@
 package com.yu;
 
+import com.yu.utils.IoUtils;
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -31,8 +33,7 @@ public class AppTest
     /**
      * Rigourous Test :-)
      */
-    public void testApp()
-    {
-        assertTrue( true );
+    public void testApp() {
+        Assert.assertTrue(IoUtils.existsUrl("http://m10.music.126.net/20171216213107/9db1ae0a187764aadb4306002df6b581/ymusic/e943/aef7/4cf6/504a58643cb902e179e299ba6d77e9fe.mp3"));
     }
 }
