@@ -8,6 +8,6 @@ public class HelloController {
 
     @GetMapping("/")
     public String helloPage() {
-        return "index.html";
+        return "/ng2/index.html";
     }
 }
