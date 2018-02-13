@@ -16,6 +16,7 @@ import com.yu.spider.music.netease.webmagic.pageprocessor.SongUrlPageProcessor;
 import com.yu.utils.IoUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,8 +46,6 @@ public class MusicService implements IMusicService {
             PageProcessorMain.run(songPageProcessor);
         });
         return this.songRepository.findById(id).switchIfEmpty(mono);
-
-
     }
 
 
@@ -118,7 +117,6 @@ public class MusicService implements IMusicService {
 
     /**
      * 根据歌词id 获取歌词
-     *
      * @param id
      * @return
      */

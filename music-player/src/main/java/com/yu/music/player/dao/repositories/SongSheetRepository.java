@@ -9,9 +9,5 @@ import reactor.core.publisher.Flux;
  * Created by yuliu on 2017/11/29 0029.
  */
 public interface SongSheetRepository extends ReactiveMongoRepository<SongSheet, String> {
-    @Query(fields = "{'songs' : 0}")
     Flux<SongSheet> findByType(int type);
-
-
-
 }

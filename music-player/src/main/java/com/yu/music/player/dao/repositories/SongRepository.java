@@ -12,6 +12,6 @@ import java.util.Map;
  * Created by yuliu on 2017/11/29 0029.
  */
 public interface SongRepository extends ReactiveMongoRepository<Song, String> {
-    Flux<Boolean> existsAllById(Iterable<String> strings);
+
 
 }

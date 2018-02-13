@@ -16,8 +16,7 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity  http) {
         return http.authorizeExchange()
-                .pathMatchers("/","/ng2/**").permitAll()
-                .and().formLogin().loginPage("/authentication")
+                .pathMatchers("/**","***").permitAll()
                 .and().build();
     }
 
